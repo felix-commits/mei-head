@@ -1,15 +1,11 @@
-import { Stack } from '@mui/system'
-import { Intro } from './Intro'
+import { NewSource } from './NewSource'
+import { CssBaseline, CssVarsProvider, Sheet } from '@mui/joy'
 
 export const App = () => (
-  <Stack
-    flex={1}
-    justifyContent="space-between"
-    p={2}
-    sx={{ background: 'linear-gradient(to right bottom, #FF0000)' }}
-  >
-    <Stack alignSelf="center">
-      <Intro />
-    </Stack>
-  </Stack>
+  <CssVarsProvider>
+    <CssBaseline />
+    <Sheet sx={{ display: 'flex', flex: 1 }}>
+      <NewSource />
+    </Sheet>
+  </CssVarsProvider>
 )
