@@ -1,14 +1,157 @@
 import Card from '@mui/joy/Card'
 import Autocomplete from '@mui/joy/Autocomplete'
-import { Stack, Typography } from '@mui/joy'
+import { Button, CardOverflow, Chip, ChipDelete, FormControl, FormLabel, IconButton, Stack, Typography } from '@mui/joy'
 import { ModeToggle } from './ModeToggle'
+import { useEffect, useState } from 'react'
+import { UploadFileRounded } from '@mui/icons-material'
+import { Recap } from './Recap'
 
-export const NewSource = () => (
-  <Stack flex={1} p={2} justifyContent="center" alignItems="center">
-    <Card>
-      <Typography>Yo la team</Typography>
-      <Autocomplete options={['Option 1', 'Option 2']} />
-    </Card>
-    <ModeToggle />
-  </Stack>
-)
+const queryComposers = input => `
+PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?label ?composer
+WHERE {
+  ?work bnfroles:r220 ?composer.
+  ?composer a foaf:Person.
+  ?composer foaf:name ?label
+  FILTER (CONTAINS(LCASE(?label), "${input}"))
+} LIMIT 10
+`
+
+const queryWorks = composer => `
+PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?work ?label
+WHERE {
+  ?expression ?o <${composer}>.
+  ?work rdarelationships:expressionOfWork ?expression.
+  ?work rdfs:label ?label .
+}
+`
+
+export const NewSource = () => {
+  const [upload, setUpload] = useState(null)
+  const [open, setOpen] = useState(false)
+
+  const [inputComposer, setInputComposer] = useState('')
+  const [composers, setComposers] = useState([])
+  const [loadingComposers, setLoadingComposers] = useState(false)
+  const [composer, setComposer] = useState('')
+
+  const [inputWork, setInputWork] = useState('')
+  const [works, setWorks] = useState([])
+  const [loadingWorks, setLoadingWorks] = useState(false)
+  const [work, setWork] = useState('')
+
+  const fetchComposers = async () => {
+    try {
+      setLoadingComposers(true)
+      const request = await fetch('https://data.bnf.fr/sparql', {
+        method: 'POST',
+        body: new URLSearchParams({ query: queryComposers(inputComposer) }),
+        headers: { Accept: 'application/json' },
+      })
+      const response = await request.json()
+      setComposers(response.results.bindings.map(e => ({ composer: e.composer.value, label: e.label.value })))
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoadingComposers(false)
+    }
+  }
+
+  const fetchWorks = async () => {
+    try {
+      setLoadingWorks(true)
+      const request = await fetch('https://data.bnf.fr/sparql', {
+        method: 'POST',
+        body: new URLSearchParams({ query: queryWorks(composer.composer) }),
+        headers: { Accept: 'application/json' },
+      })
+      const response = await request.json()
+      setWorks(
+        response.results.bindings.map(e => ({ work: e.work.value, label: e.label.value.replace(/^\[|\]$/g, '') }))
+      )
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoadingWorks(false)
+    }
+  }
+
+  const scrapFile = async () => {
+    const file = await upload.text()
+    const mei = new DOMParser().parseFromString(file, 'application/xml')
+    setInputComposer(mei.querySelector('composer').textContent.replace(/\n/g, ' ').replace(/\s+/g, ' '))
+  }
+
+  useEffect(() => {
+    if (inputComposer.length >= 3) fetchComposers()
+  }, [inputComposer])
+
+  useEffect(() => {
+    if (composer) fetchWorks()
+  }, [composer])
+
+  useEffect(() => {
+    if (upload) scrapFile()
+  }, [upload])
+
+  return (
+    <Stack flex={1} p={2} justifyContent="center" alignItems="center">
+      {!upload ? (
+        <Card>
+          <IconButton color="primary" component="label">
+            <input hidden accept=".mei" type="file" onChange={e => setUpload(e.target.files[0])} />
+            <UploadFileRounded />
+          </IconButton>
+          <Typography>Upload MEI file</Typography>
+        </Card>
+      ) : (
+        <Card>
+          <Typography>Ajout d'une nouvelle partition</Typography>
+          <FormControl>
+            <FormLabel>Fichier</FormLabel>
+            <Chip size="lg" variant="solid" endDecorator={<ChipDelete onDelete={() => setUpload(null)} />}>
+              {upload.name.split('.mei')}
+            </Chip>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Compositeur</FormLabel>
+            <Autocomplete
+              required
+              value={composer}
+              options={composers}
+              inputValue={inputComposer}
+              loading={loadingComposers}
+              onInputChange={(e, input) => setInputComposer(input)}
+              onChange={(e, value) => setComposer(value)}
+              isOptionEqualToValue={(option, value) => option?.label === value?.label}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel>Œuvre</FormLabel>
+            <Autocomplete
+              disabled={!composer}
+              value={work}
+              required
+              options={works}
+              inputValue={inputWork}
+              loading={loadingWorks}
+              onInputChange={(e, input) => setInputWork(input)}
+              onChange={(e, value) => setWork(value)}
+              isOptionEqualToValue={(option, value) => option?.label === value?.label}
+            />
+          </FormControl>
+          <CardOverflow>
+            <Button onClick={() => setOpen(true)} variant="solid" size="lg" disabled={!composer || !work}>
+              Générer les métadonnées
+            </Button>
+          </CardOverflow>
+        </Card>
+      )}
+      <ModeToggle />
+      <Recap {...{ composer, work, open, setOpen }} />
+    </Stack>
+  )
+}

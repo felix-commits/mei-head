@@ -6,6 +6,7 @@ export const ModeToggle = () => {
 
   return (
     <Button
+      variant="soft"
       onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
       sx={{ position: 'absolute', right: 16, bottom: 16 }}
     >
