@@ -30,7 +30,7 @@ export const Recap = ({ composer, work, open, setOpen }) => {
             <FormLabel>
               Identifiant du compositeur <b>{composer.label}</b>
             </FormLabel>
-            <Tooltip title={isComposerCopied ? 'Copied to clipboard !' : 'Copy to clipboard'}>
+            <Tooltip arrow title={isComposerCopied ? 'Copied to clipboard !' : 'Copy to clipboard'}>
               <Input
                 readOnly
                 onClick={() =>
@@ -45,7 +45,7 @@ export const Recap = ({ composer, work, open, setOpen }) => {
             <FormLabel>
               Identifiant de l'œuvre <b>{work.label}</b>
             </FormLabel>
-            <Tooltip title={isWorkCopied ? 'Copied to clipboard !' : 'Copy to clipboard'}>
+            <Tooltip arrow title={isWorkCopied ? 'Copied to clipboard !' : 'Copy to clipboard'}>
               <Input
                 readOnly
                 onClick={() =>
