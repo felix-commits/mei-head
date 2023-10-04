@@ -45,6 +45,19 @@ export const NewSource = () => {
   const [loadingWorks, setLoadingWorks] = useState(false)
   const [work, setWork] = useState('')
 
+  const uploadScore = async () => {
+    try {
+      const body = new FormData()
+      body.append('file', upload)
+      await fetch(import.meta.env.DEV ? 'http://127.0.0.1:8788/upload' : 'https://mei-head.pages.dev/upload', {
+        method: 'POST',
+        body,
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const fetchComposers = async () => {
     try {
       setLoadingComposers(true)
@@ -149,8 +162,8 @@ export const NewSource = () => {
             />
           </FormControl>
           <CardOverflow>
-            <Button onClick={() => setOpen(true)} variant="solid" size="lg" disabled={!composer || !work}>
-              Générer les métadonnées
+            <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
+              Uploader sur Huma-Num
             </Button>
           </CardOverflow>
         </Card>
