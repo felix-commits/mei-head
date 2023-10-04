@@ -33,11 +33,13 @@ export const NewSource = () => {
   const [upload, setUpload] = useState(null)
   const [open, setOpen] = useState(false)
 
+  const [defaultComposer, setDefaultComposer] = useState('')
   const [inputComposer, setInputComposer] = useState('')
   const [composers, setComposers] = useState([])
   const [loadingComposers, setLoadingComposers] = useState(false)
   const [composer, setComposer] = useState('')
 
+  const [defaultWork, setDefaultWork] = useState('')
   const [inputWork, setInputWork] = useState('')
   const [works, setWorks] = useState([])
   const [loadingWorks, setLoadingWorks] = useState(false)
@@ -82,7 +84,8 @@ export const NewSource = () => {
   const scrapFile = async () => {
     const file = await upload.text()
     const mei = new DOMParser().parseFromString(file, 'application/xml')
-    setInputComposer(mei.querySelector('composer').textContent.replace(/\n/g, ' ').replace(/\s+/g, ' '))
+    setDefaultComposer(mei.querySelector('[role="composer"]').textContent)
+    setDefaultWork(mei.querySelector('title').textContent)
   }
 
   useEffect(() => {
@@ -121,6 +124,7 @@ export const NewSource = () => {
             <Autocomplete
               required
               value={composer}
+              placeholder={defaultComposer}
               options={composers}
               inputValue={inputComposer}
               loading={loadingComposers}
@@ -134,6 +138,7 @@ export const NewSource = () => {
             <Autocomplete
               disabled={!composer}
               value={work}
+              placeholder={defaultWork}
               required
               options={works}
               inputValue={inputWork}
