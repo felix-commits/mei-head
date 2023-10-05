@@ -1,74 +1,86 @@
-export const onRequestPost = async context => {
-  const body = await context.request.formData()
-
-  const request = await fetch('https://api.nakala.fr/datas/uploads', {
-    headers: { 'X-API-KEY': context.env.API_KEY, Accept: 'application/json' },
-    method: 'POST',
-    body,
-  })
-
-  const response = await request.json()
-
-  const content = {
-    status: 'pending',
-    files: [response],
-    metas: [
-      {
-        propertyUri: 'http://nakala.fr/terms#title',
-        value: 'Ma première partition',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#string',
-        lang: 'fr',
-      },
-      {
-        propertyUri: 'http://nakala.fr/terms#type',
-        value: 'http://purl.org/coar/resource_type/c_c513',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#anyURI',
-      },
-      {
-        propertyUri: 'http://nakala.fr/terms#creator',
-        value: {
-          givenname: 'Jean',
-          surname: 'Dupont',
-        },
-      },
-      {
-        propertyUri: 'http://nakala.fr/terms#created',
-        value: '2020-01-01',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#string',
-      },
-      {
-        propertyUri: 'http://nakala.fr/terms#license',
-        value: 'CC-BY-4.0',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#string',
-      },
-      {
-        propertyUri: 'http://purl.org/dc/terms/subject',
-        value: 'verovio',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#string',
-        lang: 'fr',
-      },
-      {
-        propertyUri: 'http://purl.org/dc/terms/subject',
-        value: 'Une photo de chouette très chouette',
-        typeUri: 'http://www.w3.org/2001/XMLSchema#string',
-        lang: 'fr',
-      },
-    ],
+const uploadFile = async (body, API_KEY) => {
+  try {
+    const request = await fetch('https://api.nakala.fr/datas/uploads', {
+      headers: { 'X-API-KEY': API_KEY, Accept: 'application/json' },
+      method: 'POST',
+      body,
+    })
+    return await request.json()
+  } catch (error) {
+    console.error(error)
+    throw new Error("Impossible d'uploader le fichier")
   }
+}
 
-  const requestData = await fetch('https://api.nakala.fr/datas', {
-    headers: { 'X-API-KEY': context.env.API_KEY, Accept: 'application/json', 'Content-Type': 'application/json' },
-    method: 'POST',
-    body: JSON.stringify(content),
-  })
+const createData = async (body, API_KEY) => {
+  try {
+    const request = await fetch('https://api.nakala.fr/datas', {
+      headers: { 'X-API-KEY': API_KEY, Accept: 'application/json', 'Content-Type': 'application/json' },
+      method: 'POST',
+      body,
+    })
+    return await request.json()
+  } catch (error) {
+    console.error(error)
+    throw new Error('Impossible de créer la donnée')
+  }
+}
 
-  const responseData = await requestData.json()
+const download = async (dataId, fileId, API_KEY) => {
+  try {
+    const request = await fetch(`https://api.nakala.fr/data/${dataId}/${fileId}`, {
+      headers: { 'X-API-KEY': API_KEY },
+    })
+    return await request.text()
+  } catch (error) {
+    console.error(error)
+    throw new Error('Impossible de réccupérer le fichier')
+  }
+}
 
-  const getInfo = await fetch(`https://api.nakala.fr/data/${responseData.payload.id}/${response.sha1}`, {
-    headers: { 'X-API-KEY': context.env.API_KEY },
-  })
-
-  const finals = await getInfo.text()
-
-  return new Response({ status: 204, headers: { 'Access-Control-Allow-Origin': '*' } })
+export const onRequestPost = async ({ request, env }) => {
+  try {
+    const { API_KEY } = env
+    const formData = await request.formData()
+    const fileInfo = await uploadFile(formData, API_KEY)
+    const body = {
+      status: 'pending',
+      files: [fileInfo],
+      metas: [
+        {
+          propertyUri: 'http://nakala.fr/terms#title',
+          value: 'Ma première partition',
+          typeUri: 'http://www.w3.org/2001/XMLSchema#string',
+          lang: 'fr',
+        },
+        {
+          propertyUri: 'http://nakala.fr/terms#type',
+          value: 'http://purl.org/coar/resource_type/c_18cw',
+          typeUri: 'http://www.w3.org/2001/XMLSchema#anyURI',
+        },
+        {
+          propertyUri: 'http://nakala.fr/terms#creator',
+          value: {
+            givenname: 'Félix',
+            surname: 'Poullet-Pagès',
+          },
+        },
+        {
+          propertyUri: 'http://nakala.fr/terms#created',
+          value: '2020-01-01',
+          typeUri: 'http://www.w3.org/2001/XMLSchema#string',
+        },
+        {
+          propertyUri: 'http://nakala.fr/terms#license',
+          value: 'CC-BY-4.0',
+          typeUri: 'http://www.w3.org/2001/XMLSchema#string',
+        },
+      ],
+    }
+    const dataInfo = await createData(JSON.stringify(body), API_KEY)
+    const file = await download(dataInfo.payload.id, fileInfo.sha1, API_KEY)
+    return new Response(file, { status: 201, headers: { 'Access-Control-Allow-Origin': '*' } })
+  } catch (error) {
+    return new Response(error, { status: 400, headers: { 'Access-Control-Allow-Origin': '*' } })
+  }
 }
