@@ -29,6 +29,7 @@ import {
   Stack,
   Typography,
   listItemButtonClasses,
+  useColorScheme,
 } from '@mui/joy'
 import { Fragment, useState } from 'react'
 
@@ -54,6 +55,8 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
 }
 
 export default function Sidebar() {
+  const { mode } = useColorScheme()
+
   return (
     <Sheet
       className="Sidebar"
@@ -110,7 +113,11 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
       />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-        <img src={PolifoniaLogo} width="140px" />
+        <img
+          src={PolifoniaLogo}
+          width="140px"
+          {...(mode === 'dark' && { style: { WebkitFilter: 'invert(0.75)', filter: 'invert(0.75)' } })}
+        />
         <ColorSchemeToggle sx={{ ml: 'auto' }} />
       </Box>
       <Input size="sm" startDecorator={<SearchRounded />} placeholder="Search" />
@@ -234,9 +241,9 @@ export default function Sidebar() {
             </ListItemButton>
           </ListItem>
         </List>
+        <Divider />
       </Stack>
 
-      <Divider />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
         <Avatar variant="outlined" size="sm" src="https://i1.sndcdn.com/avatars-000331446673-kt5v5r-t500x500.jpg" />
         <Box sx={{ minWidth: 0, flex: 1 }}>
