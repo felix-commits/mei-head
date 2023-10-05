@@ -1,4 +1,4 @@
-import PolifoniaLogo from '../../assets/polifonia.svg'
+import PolifoniaLogo from '../assets/polifonia.svg'
 import ColorSchemeToggle from './ColorSchemeToggle'
 import { closeSidebar } from '../utils'
 import {

@@ -35,7 +35,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
 import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded'
 
-import scores from '../../assets/scores.json'
+import scores from '../assets/scores.json'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {

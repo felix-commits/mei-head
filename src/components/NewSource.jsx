@@ -4,6 +4,8 @@ import {
   Chip,
   ChipDelete,
   DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormLabel,
   IconButton,
@@ -39,9 +41,7 @@ WHERE {
 }
 `
 
-export const NewSource = ({ open, setOpen }) => {
-  const [upload, setUpload] = useState(null)
-
+export const NewSource = ({ upload, setUpload }) => {
   const [defaultComposer, setDefaultComposer] = useState('')
   const [inputComposer, setInputComposer] = useState('')
   const [composers, setComposers] = useState([])
@@ -124,30 +124,25 @@ export const NewSource = ({ open, setOpen }) => {
 
   return (
     <Modal
-      open={open}
-      onClose={() => setOpen(false)}
+      open={!!upload}
+      onClose={() => setUpload(false)}
       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     >
       <ModalDialog>
         <ModalClose variant="plain" sx={{ m: 1 }} />
-        <Typography component="h2" level="h4" textColor="inherit" fontWeight="lg" mb={1}>
+        <DialogTitle component="h2" level="h4" fontWeight="lg" mb={1}>
           Add new score
-        </Typography>
-        {!upload ? (
-          <IconButton color="primary" component="label">
-            <input hidden accept=".mei" type="file" onChange={e => setUpload(e.target.files[0])} />
-            <UploadFileRounded />
-          </IconButton>
-        ) : (
+        </DialogTitle>
+        {upload && (
           <Stack spacing={2}>
             <FormControl>
-              <FormLabel>Fichier</FormLabel>
+              <FormLabel>File</FormLabel>
               <Chip size="lg" variant="solid" endDecorator={<ChipDelete onDelete={() => setUpload(null)} />}>
                 {upload.name.split('.mei')}
               </Chip>
             </FormControl>
             <FormControl>
-              <FormLabel>Compositeur</FormLabel>
+              <FormLabel>Composer</FormLabel>
               <Autocomplete
                 required
                 value={composer}
@@ -161,7 +156,7 @@ export const NewSource = ({ open, setOpen }) => {
               />
             </FormControl>
             <FormControl>
-              <FormLabel>Œuvre</FormLabel>
+              <FormLabel>Music piece</FormLabel>
               <Autocomplete
                 disabled={!composer}
                 value={work}
@@ -175,13 +170,13 @@ export const NewSource = ({ open, setOpen }) => {
                 isOptionEqualToValue={(option, value) => option?.label === value?.label}
               />
             </FormControl>
-            <DialogActions>
-              <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
-                Confirm
-              </Button>
-            </DialogActions>
           </Stack>
         )}
+        <DialogActions>
+          <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
+            Confirm
+          </Button>
+        </DialogActions>
       </ModalDialog>
     </Modal>
   )
