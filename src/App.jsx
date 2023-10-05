@@ -31,7 +31,7 @@ export const App = () => {
                 <HomeRounded />
               </Link>
               <Link underline="hover" color="neutral" fontSize={12} fontWeight={500}>
-                Collections
+                Content
               </Link>
               <Typography color="primary" fontWeight={500} fontSize={12}>
                 Music Scores
