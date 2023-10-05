@@ -1,10 +1,20 @@
-import Card from '@mui/joy/Card'
 import Autocomplete from '@mui/joy/Autocomplete'
-import { Button, CardOverflow, Chip, ChipDelete, FormControl, FormLabel, IconButton, Stack, Typography } from '@mui/joy'
-import { ModeToggle } from './ModeToggle'
+import {
+  Button,
+  Chip,
+  ChipDelete,
+  DialogActions,
+  FormControl,
+  FormLabel,
+  IconButton,
+  Modal,
+  ModalClose,
+  ModalDialog,
+  Stack,
+  Typography,
+} from '@mui/joy'
 import { useEffect, useState } from 'react'
 import { UploadFileRounded } from '@mui/icons-material'
-import { Recap } from './Recap'
 
 const queryComposers = input => `
 PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
@@ -29,9 +39,8 @@ WHERE {
 }
 `
 
-export const NewSource = () => {
+export const NewSource = ({ open, setOpen }) => {
   const [upload, setUpload] = useState(null)
-  const [open, setOpen] = useState(false)
 
   const [defaultComposer, setDefaultComposer] = useState('')
   const [inputComposer, setInputComposer] = useState('')
@@ -114,62 +123,66 @@ export const NewSource = () => {
   }, [upload])
 
   return (
-    <Stack flex={1} p={2} justifyContent="center" alignItems="center">
-      {!upload ? (
-        <Card>
+    <Modal
+      open={open}
+      onClose={() => setOpen(false)}
+      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+    >
+      <ModalDialog>
+        <ModalClose variant="plain" sx={{ m: 1 }} />
+        <Typography component="h2" level="h4" textColor="inherit" fontWeight="lg" mb={1}>
+          Add new score
+        </Typography>
+        {!upload ? (
           <IconButton color="primary" component="label">
             <input hidden accept=".mei" type="file" onChange={e => setUpload(e.target.files[0])} />
             <UploadFileRounded />
           </IconButton>
-          <Typography>Upload MEI file</Typography>
-        </Card>
-      ) : (
-        <Card>
-          <Typography>Ajout d'une nouvelle partition</Typography>
-          <FormControl>
-            <FormLabel>Fichier</FormLabel>
-            <Chip size="lg" variant="solid" endDecorator={<ChipDelete onDelete={() => setUpload(null)} />}>
-              {upload.name.split('.mei')}
-            </Chip>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Compositeur</FormLabel>
-            <Autocomplete
-              required
-              value={composer}
-              placeholder={defaultComposer}
-              options={composers}
-              inputValue={inputComposer}
-              loading={loadingComposers}
-              onInputChange={(e, input) => setInputComposer(input)}
-              onChange={(e, value) => setComposer(value)}
-              isOptionEqualToValue={(option, value) => option?.label === value?.label}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel>Œuvre</FormLabel>
-            <Autocomplete
-              disabled={!composer}
-              value={work}
-              placeholder={defaultWork}
-              required
-              options={works}
-              inputValue={inputWork}
-              loading={loadingWorks}
-              onInputChange={(e, input) => setInputWork(input)}
-              onChange={(e, value) => setWork(value)}
-              isOptionEqualToValue={(option, value) => option?.label === value?.label}
-            />
-          </FormControl>
-          <CardOverflow>
-            <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
-              Uploader sur Huma-Num
-            </Button>
-          </CardOverflow>
-        </Card>
-      )}
-      <ModeToggle />
-      <Recap {...{ composer, work, open, setOpen }} />
-    </Stack>
+        ) : (
+          <Stack spacing={2}>
+            <FormControl>
+              <FormLabel>Fichier</FormLabel>
+              <Chip size="lg" variant="solid" endDecorator={<ChipDelete onDelete={() => setUpload(null)} />}>
+                {upload.name.split('.mei')}
+              </Chip>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Compositeur</FormLabel>
+              <Autocomplete
+                required
+                value={composer}
+                placeholder={defaultComposer}
+                options={composers}
+                inputValue={inputComposer}
+                loading={loadingComposers}
+                onInputChange={(e, input) => setInputComposer(input)}
+                onChange={(e, value) => setComposer(value)}
+                isOptionEqualToValue={(option, value) => option?.label === value?.label}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Œuvre</FormLabel>
+              <Autocomplete
+                disabled={!composer}
+                value={work}
+                placeholder={defaultWork}
+                required
+                options={works}
+                inputValue={inputWork}
+                loading={loadingWorks}
+                onInputChange={(e, input) => setInputWork(input)}
+                onChange={(e, value) => setWork(value)}
+                isOptionEqualToValue={(option, value) => option?.label === value?.label}
+              />
+            </FormControl>
+            <DialogActions>
+              <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
+                Confirm
+              </Button>
+            </DialogActions>
+          </Stack>
+        )}
+      </ModalDialog>
+    </Modal>
   )
 }

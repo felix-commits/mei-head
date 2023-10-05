@@ -8,8 +8,6 @@ export const Recap = ({ composer, work, open, setOpen }) => {
   if (composer && work)
     return (
       <Modal
-        aria-labelledby="modal-title"
-        aria-describedby="modal-desc"
         open={open}
         onClose={() => setOpen(false)}
         sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
