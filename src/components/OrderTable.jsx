@@ -1,86 +1,75 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-import * as React from 'react'
-import { ColorPaletteProp } from '@mui/joy/styles'
-import Avatar from '@mui/joy/Avatar'
-import Box from '@mui/joy/Box'
-import Button from '@mui/joy/Button'
-import Chip from '@mui/joy/Chip'
-import Divider from '@mui/joy/Divider'
-import FormControl from '@mui/joy/FormControl'
-import FormLabel from '@mui/joy/FormLabel'
-import Link from '@mui/joy/Link'
-import Input from '@mui/joy/Input'
-import Modal from '@mui/joy/Modal'
-import ModalDialog from '@mui/joy/ModalDialog'
-import ModalClose from '@mui/joy/ModalClose'
-import Select from '@mui/joy/Select'
-import Option from '@mui/joy/Option'
-import Table from '@mui/joy/Table'
-import Sheet from '@mui/joy/Sheet'
-import Checkbox from '@mui/joy/Checkbox'
-import IconButton, { iconButtonClasses } from '@mui/joy/IconButton'
-import Typography from '@mui/joy/Typography'
-import Menu from '@mui/joy/Menu'
-import MenuButton from '@mui/joy/MenuButton'
-import MenuItem from '@mui/joy/MenuItem'
-import Dropdown from '@mui/joy/Dropdown'
-// icons
-import FilterAltIcon from '@mui/icons-material/FilterAlt'
-import SearchIcon from '@mui/icons-material/Search'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded'
-import BlockIcon from '@mui/icons-material/Block'
-import AutorenewRoundedIcon from '@mui/icons-material/AutorenewRounded'
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight'
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft'
-import MoreHorizRoundedIcon from '@mui/icons-material/MoreHorizRounded'
-
+import { Fragment, useState } from 'react'
 import scores from '../assets/scores.json'
+import {
+  Avatar,
+  Box,
+  Button,
+  Checkbox,
+  Chip,
+  Divider,
+  Dropdown,
+  FormControl,
+  FormLabel,
+  IconButton,
+  Input,
+  Link,
+  Menu,
+  MenuButton,
+  MenuItem,
+  Modal,
+  ModalClose,
+  ModalDialog,
+  Option,
+  Select,
+  Sheet,
+  Stack,
+  Table,
+  Typography,
+  iconButtonClasses,
+} from '@mui/joy'
+import {
+  ArrowDropDown,
+  AutorenewRounded,
+  Block,
+  CheckRounded,
+  FilterAlt,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+  MoreHorizRounded,
+  Search,
+} from '@mui/icons-material'
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1
-  }
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) return -1
+  if (b[orderBy] > a[orderBy]) return 1
   return 0
 }
 
-type Order = 'asc' | 'desc'
+const getComparator = (order, orderBy) =>
+  order === 'desc' ? (a, b) => descendingComparator(a, b, orderBy) : (a, b) => -descendingComparator(a, b, orderBy)
 
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key
-): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy)
-}
-
-function RowMenu() {
-  return (
-    <Dropdown>
-      <MenuButton slots={{ root: IconButton }} slotProps={{ root: { variant: 'plain', color: 'neutral', size: 'sm' } }}>
-        <MoreHorizRoundedIcon />
-      </MenuButton>
-      <Menu size="sm" sx={{ minWidth: 140 }}>
-        <MenuItem>Edit</MenuItem>
-        <MenuItem>Rename</MenuItem>
-        <MenuItem>Move</MenuItem>
-        <Divider />
-        <MenuItem color="danger">Delete</MenuItem>
-      </Menu>
-    </Dropdown>
-  )
-}
+const RowMenu = () => (
+  <Dropdown>
+    <MenuButton slots={{ root: IconButton }} slotProps={{ root: { variant: 'plain', color: 'neutral', size: 'sm' } }}>
+      <MoreHorizRounded />
+    </MenuButton>
+    <Menu size="sm" sx={{ minWidth: 140 }}>
+      <MenuItem>Edit</MenuItem>
+      <MenuItem>Rename</MenuItem>
+      <MenuItem>Move</MenuItem>
+      <Divider />
+      <MenuItem color="danger">Delete</MenuItem>
+    </Menu>
+  </Dropdown>
+)
 
 export default function OrderTable() {
-  const [order, setOrder] = React.useState<Order>('desc')
-  const [selected, setSelected] = React.useState<readonly string[]>([])
-  const [open, setOpen] = React.useState(false)
+  const [order, setOrder] = useState('desc')
+  const [selected, setSelected] = useState([])
+  const [open, setOpen] = useState(false)
+
   const renderFilters = () => (
-    <React.Fragment>
+    <Fragment>
       <FormControl size="sm">
         <FormLabel>Status</FormLabel>
         <Select size="sm" placeholder="Filter by status" slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}>
@@ -106,10 +95,11 @@ export default function OrderTable() {
           <Option value="steve">Simon Raguet</Option>
         </Select>
       </FormControl>
-    </React.Fragment>
+    </Fragment>
   )
+
   return (
-    <React.Fragment>
+    <Fragment>
       <Sheet
         className="SearchAndFilters-mobile"
         sx={{
@@ -121,12 +111,12 @@ export default function OrderTable() {
           gap: 1,
         }}
       >
-        <Input size="sm" placeholder="Search" startDecorator={<SearchIcon />} sx={{ flexGrow: 1 }} />
+        <Input size="sm" placeholder="Search" startDecorator={<Search />} sx={{ flexGrow: 1 }} />
         <IconButton size="sm" variant="outlined" color="neutral" onClick={() => setOpen(true)}>
-          <FilterAltIcon />
+          <FilterAlt />
         </IconButton>
         <Modal open={open} onClose={() => setOpen(false)}>
-          <ModalDialog aria-labelledby="filter-modal" layout="fullscreen">
+          <ModalDialog layout="fullscreen">
             <ModalClose />
             <Typography id="filter-modal" level="h2">
               Filters
@@ -141,31 +131,20 @@ export default function OrderTable() {
           </ModalDialog>
         </Modal>
       </Sheet>
-      <Box
-        className="SearchAndFilters-tabletUp"
-        sx={{
-          borderRadius: 'sm',
-          py: 2,
-          display: {
-            xs: 'none',
-            sm: 'flex',
-          },
-          flexWrap: 'wrap',
-          gap: 1.5,
-          '& > *': {
-            minWidth: {
-              xs: '120px',
-              md: '160px',
-            },
-          },
-        }}
+      <Stack
+        borderRadius="sm"
+        direction="row"
+        py={2}
+        flexWrap="wrap"
+        gap={1.5}
+        sx={{ '& > *': { minWidth: { xs: '120px', md: '160px' } } }}
       >
         <FormControl sx={{ flex: 1 }} size="sm">
           <FormLabel>Search for score</FormLabel>
-          <Input size="sm" placeholder="Search" startDecorator={<SearchIcon />} />
+          <Input size="sm" placeholder="Search" startDecorator={<Search />} />
         </FormControl>
         {renderFilters()}
-      </Box>
+      </Stack>
       <Sheet
         className="OrderTableContainer"
         variant="outlined"
@@ -179,7 +158,6 @@ export default function OrderTable() {
         }}
       >
         <Table
-          aria-labelledby="tableTitle"
           stickyHeader
           hoverRow
           sx={{
@@ -211,7 +189,7 @@ export default function OrderTable() {
                   component="button"
                   onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
                   fontWeight="lg"
-                  endDecorator={<ArrowDropDownIcon />}
+                  endDecorator={<ArrowDropDown />}
                   sx={{
                     '& svg': {
                       transition: '0.2s',
@@ -262,9 +240,9 @@ export default function OrderTable() {
                       size="sm"
                       startDecorator={
                         {
-                          Paid: <CheckRoundedIcon />,
-                          Refunded: <AutorenewRoundedIcon />,
-                          Cancelled: <BlockIcon />,
+                          Paid: <CheckRounded />,
+                          Refunded: <AutorenewRounded />,
+                          Cancelled: <Block />,
                         }[row.status]
                       }
                       color={
@@ -272,20 +250,20 @@ export default function OrderTable() {
                           Paid: 'success',
                           Refunded: 'neutral',
                           Cancelled: 'danger',
-                        }[row.status] as ColorPaletteProp
+                        }[row.status]
                       }
                     >
                       {row.status}
                     </Chip>
                   </td>
                   <td>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                    <Stack direction="row" gap={1} alignItems="center">
                       <Avatar size="sm">FP</Avatar>
-                      <div>
+                      <Stack>
                         <Typography level="body-xs">Félix Poullet-Pagès</Typography>
                         <Typography level="body-xs">0000-0003-0740-7527</Typography>
-                      </div>
-                    </Box>
+                      </Stack>
+                    </Stack>
                   </td>
                   <td>
                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -300,34 +278,23 @@ export default function OrderTable() {
           </tbody>
         </Table>
       </Sheet>
-      <Box
-        className="Pagination-laptopUp"
-        sx={{
-          pt: 2,
-          gap: 1,
-          [`& .${iconButtonClasses.root}`]: { borderRadius: '50%' },
-          display: {
-            xs: 'none',
-            md: 'flex',
-          },
-        }}
-      >
-        <Button size="sm" variant="outlined" color="neutral" startDecorator={<KeyboardArrowLeftIcon />}>
+      <Stack direction="row" pt={2} gap={1} sx={{ [`& .${iconButtonClasses.root}`]: { borderRadius: '50%' } }}>
+        <Button size="sm" variant="outlined" color="neutral" startDecorator={<KeyboardArrowLeft />}>
           Previous
         </Button>
 
-        <Box sx={{ flex: 1 }} />
+        <Stack flex={1} />
         {['1', '2', '3', '…', '8', '9', '10'].map(page => (
           <IconButton key={page} size="sm" variant={Number(page) ? 'outlined' : 'plain'} color="neutral">
             {page}
           </IconButton>
         ))}
-        <Box sx={{ flex: 1 }} />
+        <Stack flex={1} />
 
-        <Button size="sm" variant="outlined" color="neutral" endDecorator={<KeyboardArrowRightIcon />}>
+        <Button size="sm" variant="outlined" color="neutral" endDecorator={<KeyboardArrowRight />}>
           Next
         </Button>
-      </Box>
-    </React.Fragment>
+      </Stack>
+    </Fragment>
   )
 }
