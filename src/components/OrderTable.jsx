@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import scores from '../assets/scores.json'
 import {
   Avatar,
@@ -39,7 +39,7 @@ import {
   Search,
 } from '@mui/icons-material'
 
-function descendingComparator(a, b, orderBy) {
+const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) return -1
   if (b[orderBy] > a[orderBy]) return 1
   return 0
@@ -63,43 +63,43 @@ const RowMenu = () => (
   </Dropdown>
 )
 
+const Filters = () => (
+  <>
+    <FormControl size="sm">
+      <FormLabel>Status</FormLabel>
+      <Select size="sm" placeholder="Filter by status" slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}>
+        <Option value="paid">Private</Option>
+        <Option value="pending">Public</Option>
+      </Select>
+    </FormControl>
+
+    <FormControl size="sm">
+      <FormLabel>Collection</FormLabel>
+      <Select size="sm" placeholder="All">
+        <Option value="all">Zarlino</Option>
+        <Option value="refund">Praetorius</Option>
+        <Option value="purchase">Josquin de Prez</Option>
+      </Select>
+    </FormControl>
+
+    <FormControl size="sm">
+      <FormLabel>Engraver</FormLabel>
+      <Select size="sm" placeholder="All">
+        <Option value="all">Marco Gurrieri</Option>
+        <Option value="olivia">Christophe Guillotel</Option>
+        <Option value="steve">Simon Raguet</Option>
+      </Select>
+    </FormControl>
+  </>
+)
+
 export default function OrderTable() {
   const [order, setOrder] = useState('desc')
   const [selected, setSelected] = useState([])
   const [open, setOpen] = useState(false)
 
-  const renderFilters = () => (
-    <Fragment>
-      <FormControl size="sm">
-        <FormLabel>Status</FormLabel>
-        <Select size="sm" placeholder="Filter by status" slotProps={{ button: { sx: { whiteSpace: 'nowrap' } } }}>
-          <Option value="paid">Private</Option>
-          <Option value="pending">Public</Option>
-        </Select>
-      </FormControl>
-
-      <FormControl size="sm">
-        <FormLabel>Collection</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">Zarlino</Option>
-          <Option value="refund">Praetorius</Option>
-          <Option value="purchase">Josquin de Prez</Option>
-        </Select>
-      </FormControl>
-
-      <FormControl size="sm">
-        <FormLabel>Engraver</FormLabel>
-        <Select size="sm" placeholder="All">
-          <Option value="all">Marco Gurrieri</Option>
-          <Option value="olivia">Christophe Guillotel</Option>
-          <Option value="steve">Simon Raguet</Option>
-        </Select>
-      </FormControl>
-    </Fragment>
-  )
-
   return (
-    <Fragment>
+    <>
       <Sheet
         className="SearchAndFilters-mobile"
         sx={{
@@ -123,7 +123,7 @@ export default function OrderTable() {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Sheet sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {renderFilters()}
+              <Filters />
               <Button color="primary" onClick={() => setOpen(false)}>
                 Submit
               </Button>
@@ -143,7 +143,7 @@ export default function OrderTable() {
           <FormLabel>Search for score</FormLabel>
           <Input size="sm" placeholder="Search" startDecorator={<Search />} />
         </FormControl>
-        {renderFilters()}
+        <Filters />
       </Stack>
       <Sheet
         className="OrderTableContainer"
@@ -295,6 +295,6 @@ export default function OrderTable() {
           Next
         </Button>
       </Stack>
-    </Fragment>
+    </>
   )
 }
