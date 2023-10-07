@@ -58,10 +58,14 @@ export const NewSource = ({ upload, setUpload }) => {
     try {
       const body = new FormData()
       body.append('file', upload)
-      await fetch(import.meta.env.DEV ? 'http://127.0.0.1:8788/upload' : 'https://mei-head.pages.dev/upload', {
-        method: 'POST',
-        body,
-      })
+      const response = await fetch(
+        import.meta.env.DEV ? 'http://127.0.0.1:8788/upload' : 'https://mei-head.pages.dev/upload',
+        {
+          method: 'POST',
+          body,
+        }
+      )
+      console.log(await response.json())
     } catch (error) {
       console.error(error)
     }
