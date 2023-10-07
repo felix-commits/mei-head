@@ -39,6 +39,8 @@ WHERE {
 `
 
 export const NewSource = ({ upload, setUpload, fetchScores }) => {
+  const [loading, setLoading] = useState(false)
+
   const [defaultComposer, setDefaultComposer] = useState('')
   const [inputComposer, setInputComposer] = useState('')
   const [composers, setComposers] = useState([])
@@ -53,6 +55,7 @@ export const NewSource = ({ upload, setUpload, fetchScores }) => {
 
   const uploadScore = async () => {
     try {
+      setLoading(true)
       const body = new FormData()
       body.append('file', upload)
       body.append('work', work.work)
@@ -68,6 +71,8 @@ export const NewSource = ({ upload, setUpload, fetchScores }) => {
       return await response.json()
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -177,7 +182,7 @@ export const NewSource = ({ upload, setUpload, fetchScores }) => {
           </Stack>
         )}
         <DialogActions>
-          <Button onClick={uploadScore} variant="solid" size="lg" disabled={!composer || !work}>
+          <Button onClick={uploadScore} loading={loading} variant="solid" size="lg" disabled={!composer || !work}>
             Confirm
           </Button>
         </DialogActions>
