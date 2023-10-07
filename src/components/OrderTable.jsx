@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import scores from '../assets/scores.json'
 import {
-  Avatar,
   Box,
   Button,
   Checkbox,
@@ -22,6 +20,7 @@ import {
   Option,
   Select,
   Sheet,
+  Skeleton,
   Stack,
   Table,
   Typography,
@@ -93,13 +92,13 @@ const Filters = () => (
   </>
 )
 
-export default function OrderTable() {
+export default function OrderTable({ scores }) {
   const [order, setOrder] = useState('desc')
   const [selected, setSelected] = useState([])
   const [open, setOpen] = useState(false)
 
   return (
-    <>
+    <Stack flex={1} justifyContent="space-between">
       <Sheet
         className="SearchAndFilters-mobile"
         sx={{
@@ -107,6 +106,7 @@ export default function OrderTable() {
             xs: 'flex',
             sm: 'none',
           },
+          flex: 1,
           my: 1,
           gap: 1,
         }}
@@ -146,10 +146,10 @@ export default function OrderTable() {
         <Filters />
       </Stack>
       <Sheet
-        className="OrderTableContainer"
         variant="outlined"
         sx={{
           display: { xs: 'none', sm: 'initial' },
+          flex: 1,
           width: '100%',
           borderRadius: 'sm',
           flexShrink: 1,
@@ -157,126 +157,135 @@ export default function OrderTable() {
           minHeight: 0,
         }}
       >
-        <Table
-          stickyHeader
-          hoverRow
-          sx={{
-            '--TableCell-headBackground': 'var(--joy-palette-background-level1)',
-            '--Table-headerUnderlineThickness': '1px',
-            '--TableRow-hoverBackground': 'var(--joy-palette-background-level1)',
-            '--TableCell-paddingY': '4px',
-            '--TableCell-paddingX': '8px',
-          }}
-        >
-          <thead>
-            <tr>
-              <th style={{ width: 48, textAlign: 'center', padding: '12px 6px' }}>
-                <Checkbox
-                  size="sm"
-                  indeterminate={selected.length > 0 && selected.length !== scores.length}
-                  checked={selected.length === scores.length}
-                  onChange={event => {
-                    setSelected(event.target.checked ? scores.map(row => row.scoreIri) : [])
-                  }}
-                  color={selected.length > 0 || selected.length === scores.length ? 'primary' : undefined}
-                  sx={{ verticalAlign: 'text-bottom' }}
-                />
-              </th>
-              <th style={{ width: 120, padding: '12px 6px' }}>
-                <Link
-                  underline="none"
-                  color="primary"
-                  component="button"
-                  onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
-                  fontWeight="lg"
-                  endDecorator={<ArrowDropDown />}
-                  sx={{
-                    '& svg': {
-                      transition: '0.2s',
-                      transform: order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
-                    },
-                  }}
-                >
-                  Piece
-                </Link>
-              </th>
-              <th style={{ width: 140, padding: '12px 6px' }}>Composer</th>
-              <th style={{ width: 140, padding: '12px 6px' }}>Status</th>
-              <th style={{ width: 240, padding: '12px 6px' }}>Engraver</th>
-              <th style={{ width: 140, padding: '12px 6px' }}> </th>
-            </tr>
-          </thead>
-          <tbody>
-            {scores
-              .slice()
-              .sort(getComparator(order, 'scoreIri'))
-              .map(row => (
-                <tr key={row.scoreIri}>
-                  <td style={{ textAlign: 'center', width: 120 }}>
-                    <Checkbox
-                      size="sm"
-                      checked={selected.includes(row.scoreIri)}
-                      color={selected.includes(row.scoreIri) ? 'primary' : undefined}
-                      onChange={event => {
-                        setSelected(ids =>
-                          event.target.checked
-                            ? ids.concat(row.scoreIri)
-                            : ids.filter(itemId => itemId !== row.scoreIri)
-                        )
-                      }}
-                      slotProps={{ checkbox: { sx: { textAlign: 'left' } } }}
-                      sx={{ verticalAlign: 'text-bottom' }}
-                    />
-                  </td>
-                  <td>
-                    <Typography level="body-xs">{row.scoreTitle}</Typography>
-                  </td>
-                  <td>
-                    <Typography level="body-xs">{row.scoreComposer}</Typography>
-                  </td>
-                  <td>
-                    <Chip
-                      variant="soft"
-                      size="sm"
-                      startDecorator={
-                        {
-                          Paid: <CheckRounded />,
-                          Refunded: <AutorenewRounded />,
-                          Cancelled: <Block />,
-                        }[row.status]
-                      }
-                      color={
-                        {
-                          Paid: 'success',
-                          Refunded: 'neutral',
-                          Cancelled: 'danger',
-                        }[row.status]
-                      }
-                    >
-                      {row.status}
-                    </Chip>
-                  </td>
-                  <td>
-                    <Stack direction="row" gap={1} alignItems="center">
-                      <Avatar size="sm">FP</Avatar>
-                      <Stack>
-                        <Typography level="body-xs">Félix Poullet-Pagès</Typography>
-                        <Typography level="body-xs">0000-0003-0740-7527</Typography>
+        <Skeleton loading={!scores.length}>
+          <Table
+            stickyHeader
+            hoverRow
+            sx={{
+              '--TableCell-headBackground': 'var(--joy-palette-background-level1)',
+              '--Table-headerUnderlineThickness': '1px',
+              '--TableRow-hoverBackground': 'var(--joy-palette-background-level1)',
+              '--TableCell-paddingY': '4px',
+              '--TableCell-paddingX': '8px',
+            }}
+          >
+            <thead>
+              <tr>
+                <th style={{ width: 48, textAlign: 'center', padding: '12px 6px' }}>
+                  <Checkbox
+                    size="sm"
+                    indeterminate={selected.length > 0 && selected.length !== scores.length}
+                    checked={selected.length === scores.length}
+                    onChange={event => {
+                      setSelected(event.target.checked ? scores.map(row => row.identifier) : [])
+                    }}
+                    color={selected.length > 0 || selected.length === scores.length ? 'primary' : undefined}
+                    sx={{ verticalAlign: 'text-bottom' }}
+                  />
+                </th>
+                <th style={{ width: 120, padding: '12px 6px' }}>
+                  <Link
+                    underline="none"
+                    color="primary"
+                    component="button"
+                    onClick={() => setOrder(order === 'asc' ? 'desc' : 'asc')}
+                    fontWeight="lg"
+                    endDecorator={<ArrowDropDown />}
+                    sx={{
+                      '& svg': {
+                        transition: '0.2s',
+                        transform: order === 'desc' ? 'rotate(0deg)' : 'rotate(180deg)',
+                      },
+                    }}
+                  >
+                    Piece
+                  </Link>
+                </th>
+                <th style={{ width: 140, padding: '12px 6px' }}>Composer</th>
+                <th style={{ width: 140, padding: '12px 6px' }}>Status</th>
+                <th style={{ width: 240, padding: '12px 6px' }}>Engraver</th>
+                <th style={{ width: 140, padding: '12px 6px' }}> </th>
+              </tr>
+            </thead>
+            <tbody>
+              {scores
+                .slice()
+                .sort(getComparator(order, 'identifier'))
+                .map(row => ({
+                  ...row,
+                  title: row.metas.find(e => e.propertyUri.includes('http://nakala.fr/terms#title'))?.value,
+                  composer: row.metas.find(e => e.propertyUri.includes('http://purl.org/dc/terms/creator'))?.value,
+                  created: row.metas.find(e => e.propertyUri.includes('http://nakala.fr/terms#created'))?.value,
+                  creator: row.metas.find(e => e.propertyUri.includes('http://nakala.fr/terms#creator'))?.value,
+                }))
+                .map(row => (
+                  <tr key={row.identifier}>
+                    <td style={{ textAlign: 'center', width: 120 }}>
+                      <Checkbox
+                        size="sm"
+                        checked={selected.includes(row.identifier)}
+                        color={selected.includes(row.identifier) ? 'primary' : undefined}
+                        onChange={event => {
+                          setSelected(ids =>
+                            event.target.checked
+                              ? ids.concat(row.identifier)
+                              : ids.filter(itemId => itemId !== row.identifier)
+                          )
+                        }}
+                        slotProps={{ checkbox: { sx: { textAlign: 'left' } } }}
+                        sx={{ verticalAlign: 'text-bottom' }}
+                      />
+                    </td>
+                    <td>
+                      <Typography level="body-xs">{row.title}</Typography>
+                    </td>
+                    <td>
+                      <Typography level="body-xs">{row.composer}</Typography>
+                    </td>
+                    <td>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Chip
+                          variant="soft"
+                          size="sm"
+                          startDecorator={
+                            {
+                              published: <CheckRounded />,
+                              pending: <AutorenewRounded />,
+                            }[row.status]
+                          }
+                          color={
+                            {
+                              published: 'success',
+                              pending: 'neutral',
+                            }[row.status]
+                          }
+                        >
+                          {row.status}
+                        </Chip>
+                        <Typography level="body-xs">{row.created}</Typography>
                       </Stack>
-                    </Stack>
-                  </td>
-                  <td>
-                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                      <Link level="body-xs" component="button">
-                        Download
-                      </Link>
-                      <RowMenu />
-                    </Box>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </Table>
+                    </td>
+                    <td>
+                      <Stack>
+                        <Typography level="body-xs">
+                          {row.creator.givenname} {row.creator.surname}
+                        </Typography>
+                        <Typography level="body-xs">{row.creator.orcid?.split('https://orcid.org/')}</Typography>
+                      </Stack>
+                    </td>
+                    <td>
+                      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                        <Link level="body-xs" component="button">
+                          Download
+                        </Link>
+                        <RowMenu />
+                      </Box>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </Table>
+        </Skeleton>
       </Sheet>
       <Stack direction="row" pt={2} gap={1} sx={{ [`& .${iconButtonClasses.root}`]: { borderRadius: '50%' } }}>
         <Button size="sm" variant="outlined" color="neutral" startDecorator={<KeyboardArrowLeft />}>
@@ -295,6 +304,6 @@ export default function OrderTable() {
           Next
         </Button>
       </Stack>
-    </>
+    </Stack>
   )
 }

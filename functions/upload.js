@@ -59,7 +59,7 @@ export const onRequestPost = async ({ request, env }) => {
       metas: [
         {
           propertyUri: 'http://nakala.fr/terms#title',
-          value: 'Ma première partition',
+          value: formData.get('workLabel'),
           typeUri: 'http://www.w3.org/2001/XMLSchema#string',
           lang: 'fr',
         },
@@ -73,16 +73,32 @@ export const onRequestPost = async ({ request, env }) => {
           value: {
             givenname: 'Félix',
             surname: 'Poullet-Pagès',
+            orcid: '0000-0003-0740-7527',
           },
         },
         {
           propertyUri: 'http://nakala.fr/terms#created',
-          value: '2020-01-01',
+          value: new Date().toISOString().substring(0, 10),
           typeUri: 'http://www.w3.org/2001/XMLSchema#string',
         },
         {
           propertyUri: 'http://nakala.fr/terms#license',
           value: 'CC-BY-4.0',
+          typeUri: 'http://www.w3.org/2001/XMLSchema#string',
+        },
+        {
+          propertyUri: 'http://purl.org/dc/terms/contributor',
+          value: formData.get('composer'),
+          typeUri: 'http://www.w3.org/2001/XMLSchema#anyURI',
+        },
+        {
+          propertyUri: 'http://purl.org/dc/terms/isVersionOf',
+          value: formData.get('work'),
+          typeUri: 'http://www.w3.org/2001/XMLSchema#anyURI',
+        },
+        {
+          propertyUri: 'http://purl.org/dc/terms/creator',
+          value: formData.get('composerLabel'),
           typeUri: 'http://www.w3.org/2001/XMLSchema#string',
         },
       ],

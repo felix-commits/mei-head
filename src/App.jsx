@@ -5,10 +5,26 @@ import { NewSource } from './components/NewSource'
 import Header from './components/Header'
 import { Breadcrumbs, Button, CssBaseline, CssVarsProvider, Link, Sheet, Stack, Typography } from '@mui/joy'
 import { Add, ChevronRightRounded, HomeRounded } from '@mui/icons-material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { BASE_URL } from './utils'
 
 export const App = () => {
   const [upload, setUpload] = useState(null)
+  const [scores, setScores] = useState([])
+
+  const fetchScores = async () => {
+    try {
+      const request = await fetch(BASE_URL + 'scores')
+      const response = await request.json()
+      setScores(response.data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  useEffect(() => {
+    fetchScores()
+  }, [])
 
   return (
     <CssVarsProvider>
@@ -52,9 +68,9 @@ export const App = () => {
               Add new score
             </Button>
           </Stack>
-          <OrderTable />
+          <OrderTable {...{ scores }} />
           <OrderList />
-          <NewSource {...{ upload, setUpload }} />
+          <NewSource {...{ upload, setUpload, fetchScores }} />
         </Stack>
       </Sheet>
     </CssVarsProvider>

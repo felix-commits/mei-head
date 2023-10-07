@@ -4,19 +4,16 @@ import {
   Chip,
   ChipDelete,
   DialogActions,
-  DialogContent,
   DialogTitle,
   FormControl,
   FormLabel,
-  IconButton,
   Modal,
   ModalClose,
   ModalDialog,
   Stack,
-  Typography,
 } from '@mui/joy'
 import { useEffect, useState } from 'react'
-import { UploadFileRounded } from '@mui/icons-material'
+import { BASE_URL } from '../utils'
 
 const queryComposers = input => `
 PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
@@ -41,7 +38,7 @@ WHERE {
 }
 `
 
-export const NewSource = ({ upload, setUpload }) => {
+export const NewSource = ({ upload, setUpload, fetchScores }) => {
   const [defaultComposer, setDefaultComposer] = useState('')
   const [inputComposer, setInputComposer] = useState('')
   const [composers, setComposers] = useState([])
@@ -58,14 +55,17 @@ export const NewSource = ({ upload, setUpload }) => {
     try {
       const body = new FormData()
       body.append('file', upload)
-      const response = await fetch(
-        import.meta.env.DEV ? 'http://127.0.0.1:8788/upload' : 'https://mei-head.pages.dev/upload',
-        {
-          method: 'POST',
-          body,
-        }
-      )
-      console.log(await response.json())
+      body.append('work', work.work)
+      body.append('workLabel', work.label)
+      body.append('composer', composer.composer)
+      body.append('composerLabel', composer.label)
+      const response = await fetch(BASE_URL + 'upload', {
+        method: 'POST',
+        body,
+      })
+      fetchScores()
+      setUpload(null)
+      return await response.json()
     } catch (error) {
       console.error(error)
     }
@@ -129,7 +129,7 @@ export const NewSource = ({ upload, setUpload }) => {
   return (
     <Modal
       open={!!upload}
-      onClose={() => setUpload(false)}
+      onClose={() => setUpload(null)}
       sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
     >
       <ModalDialog>
