@@ -15,29 +15,6 @@ import {
 import { useEffect, useState } from 'react'
 import { BASE_URL } from '../utils'
 
-const queryComposers = input => `
-PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-SELECT DISTINCT ?label ?composer
-WHERE {
-  ?work bnfroles:r220 ?composer.
-  ?composer a foaf:Person.
-  ?composer foaf:name ?label
-  FILTER (CONTAINS(LCASE(?label), "${input}"))
-} LIMIT 10
-`
-
-const queryWorks = composer => `
-PREFIX bnfroles: <http://data.bnf.fr/vocabulary/roles/>
-PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-SELECT DISTINCT ?work ?label
-WHERE {
-  ?expression ?o <${composer}>.
-  ?work rdarelationships:expressionOfWork ?expression.
-  ?work rdfs:label ?label .
-}
-`
-
 export const NewSource = ({ upload, setUpload, fetchScores }) => {
   const [loading, setLoading] = useState(false)
 
@@ -79,13 +56,11 @@ export const NewSource = ({ upload, setUpload, fetchScores }) => {
   const fetchComposers = async () => {
     try {
       setLoadingComposers(true)
-      const request = await fetch('https://data.bnf.fr/sparql', {
-        method: 'POST',
-        body: new URLSearchParams({ query: queryComposers(inputComposer) }),
-        headers: { Accept: 'application/json' },
-      })
+      const request = await fetch(
+        `https://data.bnf.fr/fr/api/index-author/All/page1?role=220&searchletters=${inputComposer}`
+      )
       const response = await request.json()
-      setComposers(response.results.bindings.map(e => ({ composer: e.composer.value, label: e.label.value })))
+      setComposers(response.documents.map(e => ({ composer: e.eid, label: e.title })))
     } catch (error) {
       console.error(error)
     } finally {
@@ -96,14 +71,10 @@ export const NewSource = ({ upload, setUpload, fetchScores }) => {
   const fetchWorks = async () => {
     try {
       setLoadingWorks(true)
-      const request = await fetch('https://data.bnf.fr/sparql', {
-        method: 'POST',
-        body: new URLSearchParams({ query: queryWorks(composer.composer) }),
-        headers: { Accept: 'application/json' },
-      })
+      const request = await fetch(`https://data.bnf.fr/fr/api/${composer.composer}/activities/tum`)
       const response = await request.json()
       setWorks(
-        response.results.bindings.map(e => ({ work: e.work.value, label: e.label.value.replace(/^\[|\]$/g, '') }))
+        response.documents.map(e => ({ work: e.eid, label: e.title.replace(/^\[|\]$/g, '') }))
       )
     } catch (error) {
       console.error(error)
