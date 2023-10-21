@@ -1,6 +1,6 @@
 {
   "name": "mei-catalog",
-  "homepage": "mei-catalog",
+  "homepage": "https://tickets.fepoulpa.net",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
