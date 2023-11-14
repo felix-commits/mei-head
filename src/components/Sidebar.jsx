@@ -1,16 +1,12 @@
-import PolifoniaLogo from '../assets/polifonia.svg'
 import ColorSchemeToggle from './ColorSchemeToggle'
 import { closeSidebar } from '../utils'
 import {
-  BallotRounded,
-  DashboardRounded,
   DescriptionRounded,
-  GroupRounded,
   KeyboardArrowDown,
+  Link,
   LogoutRounded,
   SearchRounded,
   SettingsRounded,
-  ShapeLineRounded,
   SupportRounded,
   ViewCarouselRounded,
 } from '@mui/icons-material'
@@ -29,7 +25,6 @@ import {
   Stack,
   Typography,
   listItemButtonClasses,
-  useColorScheme,
 } from '@mui/joy'
 import { Fragment, useState } from 'react'
 
@@ -54,9 +49,7 @@ function Toggler({ defaultExpanded = false, renderToggle, children }) {
   )
 }
 
-export default function Sidebar() {
-  const { mode } = useColorScheme()
-
+export const Sidebar = ({ selectedTab, setSelectedTab }) => {
   return (
     <Sheet
       className="Sidebar"
@@ -113,11 +106,9 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
       />
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-        <img
-          src={PolifoniaLogo}
-          width="140px"
-          {...(mode === 'dark' && { style: { WebkitFilter: 'invert(0.75)', filter: 'invert(0.75)' } })}
-        />
+        <Typography level="h4">Sherlock</Typography>
+        <Typography level="title">Files</Typography>
+
         <ColorSchemeToggle sx={{ ml: 'auto' }} />
       </Box>
       <Input size="sm" startDecorator={<SearchRounded />} placeholder="Search" />
@@ -131,10 +122,18 @@ export default function Sidebar() {
           }}
         >
           <ListItem>
-            <ListItemButton>
+            <ListItemButton selected={selectedTab === 0} onClick={() => setSelectedTab(0)}>
               <ViewCarouselRounded />
               <ListItemContent>
-                <Typography level="title-sm">Sites</Typography>
+                <Typography level="title-sm">Tonalities</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemButton selected={selectedTab === 1} onClick={() => setSelectedTab(1)}>
+              <Link />
+              <ListItemContent>
+                <Typography level="title-sm">URLs</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
@@ -142,10 +141,10 @@ export default function Sidebar() {
           <ListItem nested>
             <Toggler
               renderToggle={({ open, setOpen }) => (
-                <ListItemButton selected onClick={() => setOpen(!open)}>
+                <ListItemButton selected={selectedTab === 2} onClick={() => setOpen(!open)}>
                   <DescriptionRounded />
                   <ListItemContent>
-                    <Typography level="title-sm">Content</Typography>
+                    <Typography level="title-sm">Files</Typography>
                   </ListItemContent>
                   <KeyboardArrowDown sx={{ transform: open ? 'rotate(180deg)' : 'none' }} />
                 </ListItemButton>
@@ -166,61 +165,6 @@ export default function Sidebar() {
                 </ListItem>
                 <ListItem>
                   <ListItemButton>Sound recordings</ListItemButton>
-                </ListItem>
-              </List>
-            </Toggler>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton>
-              <DashboardRounded />
-              <ListItemContent>
-                <Typography level="title-sm">Collections</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton>
-              <BallotRounded />
-              <ListItemContent>
-                <Typography level="title-sm">Vocabularies</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton>
-              <ShapeLineRounded />
-              <ListItemContent>
-                <Typography level="title-sm">Ressource templates</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem nested>
-            <Toggler
-              renderToggle={({ open, setOpen }) => (
-                <ListItemButton onClick={() => setOpen(!open)}>
-                  <GroupRounded />
-                  <ListItemContent>
-                    <Typography level="title-sm">Users</Typography>
-                  </ListItemContent>
-                  <KeyboardArrowDown sx={{ transform: open ? 'rotate(180deg)' : 'none' }} />
-                </ListItemButton>
-              )}
-            >
-              <List sx={{ gap: 0.5 }}>
-                <ListItem sx={{ mt: 0.5 }}>
-                  <ListItemButton role="menuitem" component="a">
-                    My profile
-                  </ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Create a new user</ListItemButton>
-                </ListItem>
-                <ListItem>
-                  <ListItemButton>Roles & permission</ListItemButton>
                 </ListItem>
               </List>
             </Toggler>
