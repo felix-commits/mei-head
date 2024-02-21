@@ -12,7 +12,9 @@ export const Tonalities = () => {
 
   const fetchScores = async () => {
     try {
-      const request = await fetch(BASE_URL + 'scores')
+      const request = await fetch(BASE_URL + 'scores', {
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      })
       const response = await request.json()
       setScores(response.data)
     } catch (error) {
